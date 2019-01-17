@@ -5,7 +5,7 @@ mouse - look around
 """
 
 import direct.directbase.DirectStart
-from pandac.PandaModules import *
+from panda3d.core import *
 from direct.gui.OnscreenText import OnscreenText
 import sys
 
@@ -39,10 +39,18 @@ class FPS(object):
               <Collide> { Polyset keep descend } 
             in the egg file
         """
-        self.level = loader.loadModel('./models/cube.egg')
+        self.level = loader.loadModel('./models/ground.egg')
         self.level.reparentTo(render)
         self.level.setTwoSided(True)
-                
+        self.objects = self.initObjects()
+
+    def initObjects(self):
+        self.objects = []
+        obj = loader.loadModel('./models/planet_sphere')
+        obj_tex = loader.loadTexture('./models/earth_1k_tex.jpg')
+        obj.setTexture(obj_tex,1)
+        obj.reparentTo(render)
+
     def initPlayer(self):
         """ loads the player and creates all the controls for him"""
         self.node = Player()
