@@ -7,27 +7,25 @@ mouse - look around
 from panda3d.core import *
 from direct.showbase.ShowBase import ShowBase
 from direct.gui.OnscreenText import OnscreenText
-from direct.showbase import Audio3DManager
+from direct.showbase.Audio3DManager import Audio3DManager
 import sys
 
-base = ShowBase()
-
 class OBSTACAL(object):
-    def __init__(self, modelDir, texDir, soundDir):
+    def __init__(self, modelDir, texDir, soundDir, dstAudioManager):
         self.model = loader.loadModel(modelDir)
         self.model.reparentTo(render)
         self.tex = loader.loadTexture(texDir)
         self.model.setTexture(self.tex,1)
-        self.sound = base.loader.loadSfx(soundDir)
+        self.sound = dstAudioManager.loadSfx(soundDir)
+        dstAudioManager.attachSoundToObject(self.sound, self)
 
 
 class FPS(object):
-    """
-        This is a very simple FPS like -
-         a building block of any game i guess
-    """
+    
     def __init__(self):
-        """ create a FPS type game """
+        """ create a FPS type game """       
+        self.base = ShowBase()
+        self.iniAudio3d()
         self.initCollision()
         self.loadLevel()
         self.initPlayer()
@@ -55,14 +53,19 @@ class FPS(object):
         self.level.setTwoSided(True)
         self.obstacles = self.initObstacles()
 
+    def iniAudio3d(self):
+        self.audio3d = Audio3DManager(self.base.sfxManagerList[0], camera)
+
     def initObstacles(self):
         self.obstacles = []
-        self.obstacles = [self.obstacles, OBSTACAL('./models/planet_sphere','./models/earth_1k_tex.jpg','./models/camera-focus-1.wav')]
+        self.obstacles = [self.obstacles, OBSTACAL('./models/planet_sphere','./models/earth_1k_tex.jpg','./models/camera-focus-1.wav', self.audio3d)]
         
-
     def initPlayer(self):
         """ loads the player and creates all the controls for him"""
         self.node = Player()
+    
+    def start(self):
+        self.base.run()
         
 class Player(object):
     """
@@ -173,5 +176,5 @@ class Player(object):
                 self.jump = 1
         return task.cont
        
-FPS()
-base.run()  
+game = FPS()
+game.start()  
