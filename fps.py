@@ -4,10 +4,21 @@ space - jump
 mouse - look around
 """
 
-import direct.directbase.DirectStart
 from panda3d.core import *
+from direct.showbase.ShowBase import ShowBase
 from direct.gui.OnscreenText import OnscreenText
+from direct.showbase import Audio3DManager
 import sys
+
+base = ShowBase()
+
+class OBSTACAL(object):
+    def __init__(self, modelDir, texDir, soundDir):
+        self.model = loader.loadModel(modelDir)
+        self.model.reparentTo(render)
+        self.tex = loader.loadTexture(texDir)
+        self.model.setTexture(self.tex,1)
+        self.sound = base.loader.loadSfx(soundDir)
 
 
 class FPS(object):
@@ -42,14 +53,12 @@ class FPS(object):
         self.level = loader.loadModel('./models/ground.egg')
         self.level.reparentTo(render)
         self.level.setTwoSided(True)
-        self.objects = self.initObjects()
+        self.obstacles = self.initObstacles()
 
-    def initObjects(self):
-        self.objects = []
-        obj = loader.loadModel('./models/planet_sphere')
-        obj_tex = loader.loadTexture('./models/earth_1k_tex.jpg')
-        obj.setTexture(obj_tex,1)
-        obj.reparentTo(render)
+    def initObstacles(self):
+        self.obstacles = []
+        self.obstacles = [self.obstacles, OBSTACAL('./models/planet_sphere','./models/earth_1k_tex.jpg','./models/camera-focus-1.wav')]
+        
 
     def initPlayer(self):
         """ loads the player and creates all the controls for him"""
@@ -165,4 +174,4 @@ class Player(object):
         return task.cont
        
 FPS()
-run()  
+base.run()  
