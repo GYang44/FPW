@@ -10,30 +10,17 @@ from direct.gui.OnscreenText import OnscreenText
 from direct.showbase.Audio3DManager import Audio3DManager
 import sys
 
-class OBSTACAL(object):
-    def __init__(self, modelDir, texDir, soundDir, dstAudioManager):
-        self.model = loader.loadModel(modelDir)
-        self.model.reparentTo(render)
-        self.tex = loader.loadTexture(texDir)
-        self.model.setTexture(self.tex,1)
-        self.sound = dstAudioManager.loadSfx(soundDir)
-        dstAudioManager.attachSoundToObject(self.sound, self.model)
-        self.sound.setVolume(1)
-        self.sound.setLoopCount(0)
-
-
-
-class FPS(object):
+class FPS(ShowBase):
     def __init__(self):
-        """ create a FPS type game """       
-        self.base = ShowBase()
+        ShowBase.__init__(self)
+        """ create a FPS type game """
         self.initCollision()
         self.loadLevel()
         self.initPlayer()
         self.iniAudio3d()
         self.initObstacles()
-        base.accept( "escape" , sys.exit)
-        base.disableMouse()
+        self.accept( "escape" , sys.exit)
+        self.disableMouse()
         OnscreenText(text="Simple FPS Movement", style=1, fg=(1,1,1,1),
                     pos=(1.3,-0.95), align=TextNode.ARight, scale = .07)
         OnscreenText(text=__doc__, style=1, fg=(1,1,1,1),
@@ -41,8 +28,8 @@ class FPS(object):
         
     def initCollision(self):
         """ create the collision system """
-        base.cTrav = CollisionTraverser()
-        base.pusher = CollisionHandlerPusher()
+        self.cTrav = CollisionTraverser()
+        self.pusher = CollisionHandlerPusher()
         
     def loadLevel(self):
         """ load the self.level 
@@ -56,20 +43,17 @@ class FPS(object):
         self.level.setTwoSided(True)
 
     def iniAudio3d(self):
-        self.audio3d = Audio3DManager(self.base.sfxManagerList[0], self.base.cam)
-        self.base.enable_all_audio()
+        self.audio = Audio3DManager(self.sfxManagerList[0], self.camera)
+        self.enable_all_audio()
 
     def initObstacles(self):
         self.obstacles = []
-        self.obstacles = [self.obstacles, OBSTACAL('./models/planet_sphere','./models/earth_1k_tex.jpg','./models/camera-focus-1.wav', self.audio3d)]
+        self.obstacles = [self.obstacles, OBSTACAL('./models/planet_sphere','./models/earth_1k_tex.jpg','./models/camera-focus-1.mp3')]
         self.obstacles[-1].sound.play()
         
     def initPlayer(self):
         """ loads the player and creates all the controls for him"""
         self.node = Player()
-    
-    def start(self):
-        self.base.run()
         
 class Player(object):
     """
@@ -179,6 +163,18 @@ class Player(object):
             if self.readyToJump:
                 self.jump = 1
         return task.cont
-       
+
+class OBSTACAL(object):
+    def __init__(self, modelDir, texDir, soundDir):
+        self.model = loader.loadModel(modelDir)
+        self.model.reparentTo(render)
+        self.tex = loader.loadTexture(texDir)
+        self.model.setTexture(self.tex,1)
+        self.sound = base.audio.loadSfx(soundDir)
+        base.audio.attachSoundToObject(self.sound, self.model)
+        #self.sound.setVolume(1)
+        self.sound.setLoopCount(0)
+
+
 game = FPS()
-game.start()  
+game.run()  
