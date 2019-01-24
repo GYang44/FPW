@@ -10,6 +10,8 @@ from direct.gui.OnscreenText import OnscreenText
 from direct.showbase.Audio3DManager import Audio3DManager
 import sys
 
+
+
 class FPS(ShowBase):
     def __init__(self):
         ShowBase.__init__(self)
@@ -22,9 +24,9 @@ class FPS(ShowBase):
         self.accept( "escape" , sys.exit)
         self.disableMouse()
         OnscreenText(text="Simple FPS Movement", style=1, fg=(1,1,1,1),
-                    pos=(1.3,-0.95), align=TextNode.ARight, scale = .07)
-        OnscreenText(text=__doc__, style=1, fg=(1,1,1,1),
-            pos=(-1.3, 0.95), align=TextNode.ALeft, scale = .05)
+                    pos=(1.3,-0.95), align=TextNode.ARight, scale = .07)  
+                   
+        
         
     def initCollision(self):
         """ create the collision system """
@@ -48,12 +50,18 @@ class FPS(ShowBase):
 
     def initObstacles(self):
         self.obstacles = []
-        self.obstacles = [self.obstacles, OBSTACAL('./models/planet_sphere','./models/earth_1k_tex.jpg','./models/camera-focus-1.mp3')]
-        self.obstacles[-1].sound.play()
+        self.obstacles.append(OBSTACAL('./models/planet_sphere','./models/earth_1k_tex.jpg','./models/camera-focus-1_mono.wav'))
         
     def initPlayer(self):
         """ loads the player and creates all the controls for him"""
-        self.node = Player()
+        Player()
+        self.playerPosMsg = OnscreenText(style=1, fg=(1,1,1,1), pos=(-1.3, 0.95), align=TextNode.ALeft, scale = .05, mayChange=True)
+        taskMgr.add(self.displayPos, 'displayPos-task', extraArgs = [render.find('player'), self.playerPosMsg], appendTask = True)
+    
+    def displayPos(self, nodeObject, onScrennTextObject, task):
+        x,y,z = nodeObject.getPos()
+        onScrennTextObject.setText('{:6.2f}, {:6.2f}, {:6.2f}'.format(x,y,z))
+        return task.cont
         
 class Player(object):
     """
@@ -85,7 +93,7 @@ class Player(object):
         """ make the nodepath for player """
         self.node = NodePath('player')
         self.node.reparentTo(render)
-        self.node.setPos(0,0,10)
+        self.node.setPos(10,10,2)
         self.node.setScale(.05)
     
     def setUpCamera(self):
@@ -163,7 +171,7 @@ class Player(object):
             if self.readyToJump:
                 self.jump = 1
         return task.cont
-
+    
 class OBSTACAL(object):
     def __init__(self, modelDir, texDir, soundDir):
         self.model = loader.loadModel(modelDir)
@@ -172,9 +180,9 @@ class OBSTACAL(object):
         self.model.setTexture(self.tex,1)
         self.sound = base.audio.loadSfx(soundDir)
         base.audio.attachSoundToObject(self.sound, self.model)
-        #self.sound.setVolume(1)
+        self.sound.setVolume(1)
         self.sound.setLoopCount(0)
-
+        self.sound.play()
 
 game = FPS()
 game.run()  
