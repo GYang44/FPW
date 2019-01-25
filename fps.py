@@ -10,6 +10,8 @@ from direct.gui.OnscreenText import OnscreenText
 from direct.showbase.Audio3DManager import Audio3DManager
 import sys
 
+import datetime
+
 
 
 class FPS(ShowBase):
@@ -57,10 +59,16 @@ class FPS(ShowBase):
         Player()
         self.playerPosMsg = OnscreenText(style=1, fg=(1,1,1,1), pos=(-1.3, 0.95), align=TextNode.ALeft, scale = .05, mayChange=True)
         taskMgr.add(self.displayPos, 'displayPos-task', extraArgs = [render.find('player'), self.playerPosMsg], appendTask = True)
+        taskMgr.add(self.logPos, 'logPos-task', extraArgs = [render.find('player'), open("./player_pos_.csv", "a")], appendTask = True)
     
     def displayPos(self, nodeObject, onScrennTextObject, task):
         x,y,z = nodeObject.getPos()
         onScrennTextObject.setText('{:6.2f}, {:6.2f}, {:6.2f}'.format(x,y,z))
+        return task.cont
+
+    def logPos(self, nodeObject, file, task):
+        x,y,z = nodeObject.getPos()
+        file.write('{}, {}, {}, {},\n'.format(datetime.datetime.now(),x,y,z))
         return task.cont
         
 class Player(object):
