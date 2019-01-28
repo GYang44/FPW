@@ -1,18 +1,9 @@
-"""
-awsd - movement
-space - jump
-mouse - look around
-"""
-
 from panda3d.core import *
 from direct.showbase.ShowBase import ShowBase
 from direct.gui.OnscreenText import OnscreenText
 from direct.showbase.Audio3DManager import Audio3DManager
 import sys
-
 import datetime
-
-
 
 class FPS(ShowBase):
     def __init__(self):
@@ -25,9 +16,6 @@ class FPS(ShowBase):
         self.initObstacles()
         self.accept( "escape" , sys.exit)
         self.disableMouse()
-        OnscreenText(text="Simple FPS Movement", style=1, fg=(1,1,1,1),
-                    pos=(1.3,-0.95), align=TextNode.ARight, scale = .07)  
-                   
         
         
     def initCollision(self):
@@ -51,8 +39,8 @@ class FPS(ShowBase):
         self.enable_all_audio()
 
     def initObstacles(self):
-        self.obstacles = []
-        self.obstacles.append(OBSTACAL('./models/planet_sphere','./models/earth_1k_tex.jpg','./models/camera-focus-1_mono.wav'))
+        self.keyObjects = []
+        self.keyObjects.append(wayPoint('./models/planet_sphere','./models/earth_1k_tex.jpg','./models/camera-focus-1_mono.wav', 1,2,3))
         
     def initPlayer(self):
         """ loads the player and creates all the controls for him"""
@@ -162,7 +150,7 @@ class Player(object):
         return task.cont
         
     def jumpUpdate(self,task):
-        """ this task simulates gravity and makes the player jump """
+        # this task simulates gravity and makes the player jump
         # get the highest Z from the down casting ray
         highestZ = -100
         for i in range(self.nodeGroundHandler.getNumEntries()):
@@ -179,18 +167,30 @@ class Player(object):
             if self.readyToJump:
                 self.jump = 1
         return task.cont
+
     
-class OBSTACAL(object):
-    def __init__(self, modelDir, texDir, soundDir):
+class keyObject(object):
+    def __init__(self, modelDir, texDir, soundDir, posX = 0, posY = 0, posZ = 0):
         self.model = loader.loadModel(modelDir)
         self.model.reparentTo(render)
         self.tex = loader.loadTexture(texDir)
         self.model.setTexture(self.tex,1)
+        self.model.setPos(posX, posY, posZ)
         self.sound = base.audio.loadSfx(soundDir)
         base.audio.attachSoundToObject(self.sound, self.model)
         self.sound.setVolume(1)
         self.sound.setLoopCount(0)
+
+class wayPoint(keyObject):
+    def __init__(self, modelDir, texDir, soundDir, posX = 0, posY = 0, posZ = 0):
+        keyObject.__init__(self, modelDir, texDir, soundDir, posX, posY, posZ)
         self.sound.play()
+    
+    def collition(self):
+        # If collide with player
+        # set position
+        pass
+    
 
 game = FPS()
 game.run()  
