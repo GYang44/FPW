@@ -22,6 +22,8 @@ class FPS(ShowBase):
         """ create the collision system """
         self.cTrav = CollisionTraverser()
         self.pusher = CollisionHandlerPusher()
+        self.pusher.addInPattern('into-%in')
+        #self.collHandEvent.addOutPattern('outof-%in')
         
     def loadLevel(self):
         """ load the self.level 
@@ -40,7 +42,7 @@ class FPS(ShowBase):
 
     def initObstacles(self):
         self.keyObjects = []
-        self.keyObjects.append(wayPoint('./models/planet_sphere','./models/earth_1k_tex.jpg','./models/camera-focus-1_mono.wav', 1,2,3))
+        self.keyObjects.append(wayPoint('./models/planet_sphere','./models/earth_1k_tex.jpg','./models/camera-focus-1_mono.wav', 1,2,1))
         
     def initPlayer(self):
         """ loads the player and creates all the controls for him"""
@@ -104,8 +106,8 @@ class Player(object):
         cn = CollisionNode('player')
         cn.addSolid(CollisionSphere(0,0,0,3))
         solid = self.node.attachNewNode(cn)
-        base.cTrav.addCollider(solid,base.pusher)
-        base.pusher.addCollider(solid,self.node, base.drive.node())
+        base.cTrav.addCollider(solid, base.pusher)
+        base.pusher.addCollider(solid, self.node, base.drive.node())
         # init players floor collisions
         ray = CollisionRay()
         ray.setOrigin(0,0,-.2)
@@ -185,11 +187,18 @@ class wayPoint(keyObject):
     def __init__(self, modelDir, texDir, soundDir, posX = 0, posY = 0, posZ = 0):
         keyObject.__init__(self, modelDir, texDir, soundDir, posX, posY, posZ)
         self.sound.play()
+        self.initCollision(posX, posY, posZ)
+
+    def initCollision(self, posX, posY, posZ):
+        cn = self.model.attachNewNode(CollisionNode('colNode'))
+        cn.node().addSolid(CollisionSphere(0, 0, 0, 1))
+        
+        base.accept('into-' + cn.name, self.collition )
     
-    def collition(self):
+    def collition(self, fromObj):
         # If collide with player
         # set position
-        pass
+        self.sound.stop()
     
 
 game = FPS()
