@@ -42,7 +42,7 @@ class FPS(ShowBase):
 
     def initObstacles(self):
         self.keyObjects = []
-        self.keyObjects.append(wayPoint('./models/planet_sphere','./models/earth_1k_tex.jpg','./models/camera-focus-1_mono.wav', 1,2,1))
+        self.keyObjects.append(wayPoint('./models/planet_sphere','./models/earth_1k_tex.jpg','./models/camera-focus-1_mono.wav', 1, 2, 1))
         
     def initPlayer(self):
         """ loads the player and creates all the controls for him"""
@@ -184,21 +184,36 @@ class keyObject(object):
         self.sound.setLoopCount(0)
 
 class wayPoint(keyObject):
+    path = []
     def __init__(self, modelDir, texDir, soundDir, posX = 0, posY = 0, posZ = 0):
         keyObject.__init__(self, modelDir, texDir, soundDir, posX, posY, posZ)
         self.sound.play()
         self.initCollision(posX, posY, posZ)
+        self.loadPath()
+
+    def loadPath(self):
+        pathFile = open("./path.csv", "r")
+        for line in pathFile:
+            x, y, z = line.split(',')
+            self.path.append( (float(x), float(y), float(z)) )
+        pathFile.close()
+        self.moveNext()
 
     def initCollision(self, posX, posY, posZ):
         cn = self.model.attachNewNode(CollisionNode('colNode'))
         cn.node().addSolid(CollisionSphere(0, 0, 0, 1))
-        
         base.accept('into-' + cn.name, self.collition )
     
+    def moveNext(self):
+        self.model.setPos(self.path[0])
+        self.path.remove(self.path[0])
+
     def collition(self, fromObj):
         # If collide with player
-        # set position
-        self.sound.stop()
+        if len(self.path) > 0:
+            self.moveNext()
+        else:
+            self.sound.stop()
     
 
 game = FPS()
