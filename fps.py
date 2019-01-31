@@ -42,7 +42,7 @@ class FPS(ShowBase):
 
     def initObstacles(self):
         self.keyObjects = []
-        self.keyObjects.append(wayPoint('./models/planet_sphere','./models/earth_1k_tex.jpg','./models/camera-focus-1_mono.wav', 1, 2, 1))
+        self.keyObjects.append(wayPoint('./models/planet_sphere','./models/earth_1k_tex.jpg','./models/camera-focus-1_mono.wav', 0, 0, 1))
         
     def initPlayer(self):
         """ loads the player and creates all the controls for him"""
