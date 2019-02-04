@@ -53,7 +53,8 @@ class FPS(ShowBase):
     
     def displayPos(self, nodeObject, onScrennTextObject, task):
         x,y,z = nodeObject.getPos()
-        onScrennTextObject.setText('{:6.2f}, {:6.2f}, {:6.2f}'.format(x,y,z))
+        y, p, r = nodeObject.getHpr()
+        onScrennTextObject.setText('{:6.2f}, {:6.2f}, {:6.2f}\n {:6.2f}, {:6.2f}, {:6.2f}'.format(x,y,z, r,p,y))
         return task.cont
 
     def logPos(self, nodeObject, file, task):
@@ -70,9 +71,13 @@ class Player(object):
     BACK = Vec3(0,-1,0)
     LEFT = Vec3(-1,0,0)
     RIGHT = Vec3(1,0,0)
+    LEFT_TURN = Vec3(60,0,0)
+    RIGHT_TURN = Vec3(-60,0,0)
+    NEUTRAL = Vec3(0,0,0)
     STOP = Vec3(0)
     walk = STOP
     strafe = STOP
+    heading = NEUTRAL
     readyToJump = False
     jump = 0
     
@@ -93,13 +98,14 @@ class Player(object):
         self.node.reparentTo(render)
         self.node.setPos(10,10,2)
         self.node.setScale(.05)
-    
+
     def setUpCamera(self):
         """ puts camera at the players node """
         pl =  base.cam.node().getLens()
         pl.setFov(70)
         base.cam.node().setLens(pl)
         base.camera.reparentTo(self.node)
+        base.camera.setHpr(Vec3(0,0,0))
         
     def createCollisions(self):
         """ create a collision solid and ray for the player """
@@ -124,7 +130,6 @@ class Player(object):
         """ attach key events """
         base.accept( "space" , self.__setattr__,["readyToJump",True])
         base.accept( "space-up" , self.__setattr__,["readyToJump",False])
-        base.accept( "s" , self.__setattr__,["walk",self.STOP] )
         base.accept( "w" , self.__setattr__,["walk",self.FORWARD])
         base.accept( "s" , self.__setattr__,["walk",self.BACK] )
         base.accept( "s-up" , self.__setattr__,["walk",self.STOP] )
@@ -133,6 +138,11 @@ class Player(object):
         base.accept( "d" , self.__setattr__,["strafe",self.RIGHT] )
         base.accept( "a-up" , self.__setattr__,["strafe",self.STOP] )
         base.accept( "d-up" , self.__setattr__,["strafe",self.STOP] )
+        base.accept( "arrow_left" , self.__setattr__,["heading",self.LEFT_TURN])
+        base.accept( "arrow_right" , self.__setattr__,["heading",self.RIGHT_TURN])
+        base.accept( "arrow_left-up" , self.__setattr__,["heading",self.NEUTRAL])
+        base.accept( "arrow_right-up" , self.__setattr__,["heading",self.NEUTRAL])
+        
         
     def mouseUpdate(self,task):
         """ this task updates the mouse """
@@ -143,12 +153,16 @@ class Player(object):
             self.node.setH(self.node.getH() -  (x - base.win.getXSize()/2)*0.1)
             base.camera.setP(base.camera.getP() - (y - base.win.getYSize()/2)*0.1)
         return task.cont
+
+    def headingUpdate(self,task):
+        return task.cont
     
     def moveUpdate(self,task): 
         """ this task makes the player move """
         # move where the keys set it
         self.node.setPos(self.node,self.walk*globalClock.getDt()*self.speed)
         self.node.setPos(self.node,self.strafe*globalClock.getDt()*self.speed)
+        self.node.setHpr(self.node,self.heading*globalClock.getDt())
         return task.cont
         
     def jumpUpdate(self,task):
