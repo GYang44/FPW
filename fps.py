@@ -53,7 +53,7 @@ class FPS(ShowBase):
     
     def displayPos(self, nodeObject, onScrennTextObject, task):
         x,y,z = nodeObject.getPos()
-        y, p, r = nodeObject.getHpr()
+        y, p, r = base.camera.getHpr()
         onScrennTextObject.setText('{:6.2f}, {:6.2f}, {:6.2f}\n {:6.2f}, {:6.2f}, {:6.2f}'.format(x,y,z, r,p,y))
         return task.cont
 
@@ -151,7 +151,7 @@ class Player(object):
         y = md.getY()
         if base.win.movePointer(0, round(base.win.getXSize()/2), round(base.win.getYSize()/2)):
             self.node.setH(self.node.getH() -  (x - base.win.getXSize()/2)*0.1)
-            base.camera.setP(base.camera.getP() - (y - base.win.getYSize()/2)*0.1)
+            #base.camera.setP(base.camera.getP() - (y - base.win.getYSize()/2)*0.1)
         return task.cont
 
     def headingUpdate(self,task):
@@ -226,6 +226,9 @@ class wayPoint(keyObject):
         # If collide with player
         if len(self.path) > 0:
             self.moveNext()
+            feedBack = base.audio.loadSfx("./models/accending.mp3")
+            feedBack.setVolume(0.5)
+            feedBack.play()
         else:
             self.sound.stop()
     
