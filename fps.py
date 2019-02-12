@@ -53,13 +53,14 @@ class FPS(ShowBase):
     
     def displayPos(self, nodeObject, onScrennTextObject, task):
         x,y,z = nodeObject.getPos()
-        y, p, r = base.camera.getHpr()
-        onScrennTextObject.setText('{:6.2f}, {:6.2f}, {:6.2f}\n {:6.2f}, {:6.2f}, {:6.2f}'.format(x,y,z, r,p,y))
+        h,p,r = nodeObject.getHpr()
+        onScrennTextObject.setText('{:6.2f}, {:6.2f}, {:6.2f}\n {:6.2f}, {:6.2f}, {:6.2f}'.format(x,y,z,r,p,h))
         return task.cont
 
     def logPos(self, nodeObject, file, task):
         x,y,z = nodeObject.getPos()
-        file.write('{}, {}, {}, {},\n'.format(datetime.datetime.now(),x,y,z))
+        h,p,r = nodeObject.getHpr()
+        file.write('{}, {}, {}, {}, {}, {}, {}\n'.format(datetime.datetime.now(),x,y,z,r,p,h))
         return task.cont
         
 class Player(object):
@@ -96,7 +97,7 @@ class Player(object):
         """ make the nodepath for player """
         self.node = NodePath('player')
         self.node.reparentTo(render)
-        self.node.setPos(10,10,2)
+        self.node.setPos(1,1,1)
         self.node.setScale(.05)
 
     def setUpCamera(self):
@@ -188,6 +189,7 @@ class Player(object):
 class keyObject(object):
     def __init__(self, modelDir, texDir, soundDir, posX = 0, posY = 0, posZ = 0):
         self.model = loader.loadModel(modelDir)
+        #self.model.setScale(0.25, 0.25, 0.25)
         self.model.reparentTo(render)
         self.tex = loader.loadTexture(texDir)
         self.model.setTexture(self.tex,1)
