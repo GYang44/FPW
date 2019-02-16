@@ -189,7 +189,7 @@ class Player(object):
 class keyObject(object):
     def __init__(self, modelDir, texDir, soundDir, posX = 0, posY = 0, posZ = 0):
         self.model = loader.loadModel(modelDir)
-        #self.model.setScale(0.25, 0.25, 0.25)
+        #self.model.setScale(0.25, 0.25, 1)
         self.model.reparentTo(render)
         self.tex = loader.loadTexture(texDir)
         self.model.setTexture(self.tex,1)

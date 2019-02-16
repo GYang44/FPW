@@ -1,4 +1,4 @@
-plotTrack(JWhelan2, path, 30, 0.5);
+plotTrack(gyang3, path, 30, 0.5);
 xlim([-10,40]);
 ylim([-10,15]);
 
