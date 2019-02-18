@@ -1,3 +1,4 @@
+%% Calculate distance from point p to a line passes a and b
 function d = pointToLine(a, b, p)
     if a == b
         error('a, b are the same point')

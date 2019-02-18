@@ -5,7 +5,7 @@ plot(path(:,1),path(:,2),'r');
 dirX = cos(path(:,6)/180*pi+pi/2);
 dirY = sin(path(:,6)/180*pi+pi/2);
 quiver(path(1:vectorRate:end,1), path(1:vectorRate:end,2), dirX(1:vectorRate:end), dirY(1:vectorRate:end), vectorLength, 'r');
-plot(course(:,1), course(:,2),'b');
+plot(course(:,1), course(:,2),'-b.','MarkerSize',12);
 axis equal
 hold off;
 end

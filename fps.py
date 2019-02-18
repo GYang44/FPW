@@ -60,7 +60,7 @@ class FPS(ShowBase):
     def logPos(self, nodeObject, file, task):
         x,y,z = nodeObject.getPos()
         h,p,r = nodeObject.getHpr()
-        file.write('{}, {}, {}, {}, {}, {}, {}\n'.format(datetime.datetime.now(),x,y,z,r,p,h))
+        file.write('{}, {}, {}, {}, {}, {}, {}, {}\n'.format(datetime.datetime.now(),x,y,z,r,p,h,len(self.keyObjects[0].path)))
         return task.cont
         
 class Player(object):
